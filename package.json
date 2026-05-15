@@ -1,0 +1,20 @@
+{
+  "name": "financial-statement-analyzer-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "start": "cd server && node index.js",
+    "worker": "node server/workers/embeddingWorker.js",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev:worker": "cd server && node workers/embeddingWorker.js",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:worker\""
+  },
+  "dependencies": {
+    "mongodb": "^7.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

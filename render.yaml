@@ -1,0 +1,86 @@
+# Render Blueprint — FinSight AI
+# https://render.com/docs/blueprint-spec
+
+services:
+  # ── Web Server ─────────────────────────────────────────
+  - type: web
+    name: finsight-ai
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_ATLAS_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: financial_analyzer
+      - key: GROQ_API_KEY
+        sync: false
+      - key: HUGGINGFACE_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: CHAT_MODEL
+        value: llama-3.3-70b-versatile
+      - key: VECTOR_INDEX_NAME
+        value: chunk_vector_index
+      - key: VECTOR_SEARCH_K
+        value: "8"
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: REDIS_URL
+        sync: false
+      - key: JOB_QUEUE_NAME
+        value: embedding-jobs
+      - key: CACHE_TTL_SECONDS
+        value: "3600"
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: LANDING_URL
+        sync: false
+
+  # ── Background Worker (BullMQ) ─────────────────────────
+  - type: worker
+    name: finsight-ai-worker
+    runtime: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: npm run worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_ATLAS_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: financial_analyzer
+      - key: GROQ_API_KEY
+        sync: false
+      - key: HUGGINGFACE_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: CHAT_MODEL
+        value: llama-3.3-70b-versatile
+      - key: VECTOR_INDEX_NAME
+        value: chunk_vector_index
+      - key: JWT_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JOB_QUEUE_NAME
+        value: embedding-jobs
