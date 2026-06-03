@@ -137,9 +137,122 @@ app.get('/api/sessions/:sessionId/rows', authenticate, validateSession, async (r
   }
 });
 
+// ── Explicit session routes (avoid double-nesting from uploadRouter) ──
+// uploadRouter defines /sessions and /sessions/:id but is mounted at /api/sessions,
+// creating /api/sessions/sessions. These explicit handlers fix that.
+
+app.get('/api/sessions', authenticate, async (req, res) => {
+  try {
+    const mongoose = (await import('mongoose')).default;
+    const Session = (await import('./models/Session.js')).default;
+    const matchStage = req.user?.userId
+      ? { userId: new mongoose.Types.ObjectId(req.user.userId), status: { $in: ['ready', 'processing'] } }
+      : { status: { $in: ['ready', 'processing'] } };
+
+    const sessions = await Session.aggregate([
+      { $match: matchStage },
+      {
+        $project: {
+          sessionId: 1, filename: 1, fileType: 1, sourceFormat: 1, status: 1,
+          errorMessage: 1, rowCount: 1, columnHeaders: 1, uploadedAt: 1,
+          workspaceIds: 1, insights: 1,
+          messageCount: { $size: '$messages' },
+          lastMessage: { $arrayElemAt: ['$messages', -1] },
+          lastActiveAt: { $ifNull: [{ $arrayElemAt: ['$messages.timestamp', -1] }, '$uploadedAt'] },
+        },
+      },
+      { $sort: { lastActiveAt: -1 } },
+      { $limit: 50 },
+    ]);
+
+    return res.json({ sessions });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/sessions/:sessionId', authenticate, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    const Session = (await import('./models/Session.js')).default;
+    const Chunk = (await import('./models/Chunk.js')).default;
+    const RawTxn = (await import('./models/RawTransaction.js')).default;
+
+    const session = await Session.findOne({ sessionId });
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    if (userId && session.userId && session.userId.toString() !== userId) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    if (session.status === 'processing') {
+      try {
+        const { embeddingQueue } = await import('./services/jobQueue.js');
+        const jobs = await embeddingQueue.getJobs(['waiting', 'active', 'delayed']);
+        for (const job of jobs) {
+          if (job.data?.sessionId === sessionId) { await job.remove().catch(() => {}); break; }
+        }
+      } catch { /* Redis unavailable */ }
+    }
+
+    await Promise.all([
+      Chunk.deleteMany({ sessionId }),
+      RawTxn.deleteMany({ sessionId }),
+      Session.deleteOne({ sessionId }),
+    ]);
+
+    try {
+      const { invalidateSession } = await import('./services/queryCache.js');
+      await invalidateSession(sessionId);
+    } catch { /* Redis unavailable */ }
+
+    return res.status(200).json({ message: 'Session deleted successfully' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/sessions/:sessionId/job-status', authenticate, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const Session = (await import('./models/Session.js')).default;
+    const session = await Session.findOne({ sessionId }).lean();
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    // If already ready or error, return immediately
+    if (session.status === 'ready' || session.status === 'error') {
+      return res.json({
+        status: session.status,
+        progress: session.status === 'ready' ? 100 : 0,
+        errorMessage: session.errorMessage || null,
+      });
+    }
+
+    // Try to get progress from BullMQ job
+    try {
+      const { embeddingQueue } = await import('./services/jobQueue.js');
+      const jobs = await embeddingQueue.getJobs(['waiting', 'active', 'delayed', 'completed', 'failed']);
+      const job = jobs.find(j => j.data?.sessionId === sessionId);
+      if (job) {
+        const state = await job.getState();
+        return res.json({
+          status: state === 'completed' ? 'ready' : state === 'failed' ? 'error' : 'processing',
+          progress: typeof job.progress === 'number' ? job.progress : 0,
+          errorMessage: state === 'failed' ? (job.failedReason || 'Processing failed') : null,
+          jobId: job.id,
+        });
+      }
+    } catch { /* Redis unavailable */ }
+
+    return res.json({ status: 'processing', progress: 0 });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Session sub-routes: messages + insights ───────────────────
-// uploadRouter handles /sessions/:id/messages and /sessions/:id/insights
-// Mounted AFTER rows so rows wins the more-specific match
+// uploadRouter handles /:id/messages and /:id/insights
+// Mounted AFTER explicit session routes so they take priority
 app.use('/api/sessions', authenticate, uploadRouter);
 
 // ── Health check ─────────────────────────────────────────────

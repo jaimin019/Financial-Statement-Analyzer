@@ -1,0 +1,251 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/dmsans/v15/rP2Cp2ywxg089UriCZ2IHSeH.woff2") format("woff2");
+}
+
+/*
+  FinSight AI — Premium fintech dark theme.
+  Bold, distinctive, trustworthy. Deep midnight base, electric mint accent for trust/positive,
+  warm coral for negative/danger, restrained gold for premium highlights.
+*/
+
+@theme inline {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Menlo", monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-gold: var(--gold);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Deep midnight base */
+  --background: oklch(0.16 0.02 250);
+  --foreground: oklch(0.97 0.01 250);
+  --surface: oklch(0.19 0.022 252);
+  --surface-elevated: oklch(0.22 0.025 252);
+  --surface-overlay: oklch(0.26 0.028 252);
+
+  --card: oklch(0.20 0.024 252);
+  --card-foreground: oklch(0.97 0.01 250);
+  --popover: oklch(0.22 0.025 252);
+  --popover-foreground: oklch(0.97 0.01 250);
+
+  /* Electric mint — trust, money, growth */
+  --primary: oklch(0.82 0.17 165);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --primary-glow: oklch(0.88 0.19 165);
+
+  --secondary: oklch(0.28 0.03 252);
+  --secondary-foreground: oklch(0.97 0.01 250);
+
+  --muted: oklch(0.25 0.025 252);
+  --muted-foreground: oklch(0.68 0.02 250);
+
+  --accent: oklch(0.78 0.16 220);
+  --accent-foreground: oklch(0.15 0.02 250);
+
+  --destructive: oklch(0.68 0.21 22);
+  --destructive-foreground: oklch(0.98 0.005 250);
+
+  --success: oklch(0.78 0.17 162);
+  --success-foreground: oklch(0.15 0.02 250);
+
+  --warning: oklch(0.82 0.15 80);
+  --warning-foreground: oklch(0.15 0.02 250);
+
+  --gold: oklch(0.84 0.14 88);
+
+  --border: oklch(0.30 0.02 252 / 0.5);
+  --border-strong: oklch(0.40 0.025 252);
+  --input: oklch(0.26 0.025 252);
+  --ring: oklch(0.82 0.17 165 / 0.6);
+
+  --chart-1: oklch(0.82 0.17 165);
+  --chart-2: oklch(0.78 0.16 220);
+  --chart-3: oklch(0.84 0.14 88);
+  --chart-4: oklch(0.72 0.18 305);
+  --chart-5: oklch(0.68 0.21 22);
+
+  /* Gradients & shadows */
+  --gradient-primary: linear-gradient(135deg, oklch(0.82 0.17 165), oklch(0.78 0.16 200));
+  --gradient-surface: linear-gradient(180deg, oklch(0.22 0.025 252), oklch(0.18 0.022 250));
+  --gradient-hero: radial-gradient(ellipse at top, oklch(0.30 0.08 200 / 0.4), transparent 60%),
+                   radial-gradient(ellipse at bottom right, oklch(0.32 0.12 165 / 0.3), transparent 50%);
+  --gradient-glow: radial-gradient(circle at center, oklch(0.82 0.17 165 / 0.35), transparent 70%);
+
+  --shadow-glow: 0 0 60px -10px oklch(0.82 0.17 165 / 0.4);
+  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 8px 32px -12px oklch(0 0 0 / 0.6);
+  --shadow-elevated: 0 1px 0 0 oklch(1 0 0 / 0.06) inset, 0 20px 50px -20px oklch(0 0 0 / 0.7);
+
+  --transition-smooth: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dark {
+  /* same as root — app is dark-only */
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background:
+      radial-gradient(ellipse at 20% -10%, oklch(0.30 0.08 200 / 0.18), transparent 50%),
+      radial-gradient(ellipse at 80% 110%, oklch(0.32 0.10 165 / 0.12), transparent 50%),
+      var(--color-background);
+    min-height: 100vh;
+  }
+  ::selection {
+    background: oklch(0.82 0.17 165 / 0.3);
+    color: var(--foreground);
+  }
+}
+
+/* Utility classes */
+.glass {
+  background: oklch(0.22 0.025 252 / 0.7);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid oklch(1 0 0 / 0.06);
+}
+
+.glass-strong {
+  background: oklch(0.20 0.024 252 / 0.85);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid oklch(1 0 0 / 0.08);
+}
+
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(oklch(1 0 0 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.25 0.025 252) 0%,
+    oklch(0.30 0.028 252) 50%,
+    oklch(0.25 0.025 252) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.82 0.17 165 / 0.5); }
+  50% { box-shadow: 0 0 0 12px oklch(0.82 0.17 165 / 0); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.30 0.025 252);
+  border-radius: 10px;
+  border: 2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.40 0.025 252);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
